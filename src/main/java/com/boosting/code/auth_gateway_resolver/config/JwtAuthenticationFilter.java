@@ -1,6 +1,6 @@
 package com.boosting.code.auth_gateway_resolver.config;
 
-import com.boosting.code.auth_gateway_resolver.repositories.TokenRepository;
+import com.boosting.code.auth_gateway_resolver.repositories.ITokenRepository;
 import com.boosting.code.auth_gateway_resolver.services.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -15,12 +15,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class JwtAthenticationFilter extends OncePerRequestFilter {
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final CharSequence AUTH_CONTROLLER_PATH = "/api/v1/auth";
     private static final int LENGTH_BEARER_PREFIX = 7;
     private JwtService jwtService;
     private UserDetailsService userDetailsService;
-    private TokenRepository tokenRepository;
+    private ITokenRepository ITokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -44,7 +44,7 @@ public class JwtAthenticationFilter extends OncePerRequestFilter {
         userEmail = jwtService.extractUsername(jwt);
         if(userEmail!=null  && SecurityContextHolder.getContext().getAuthentication()==null){
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            var isTokenValid = this.tokenRepository.findByToken(jwt)
+            var isTokenValid = this.ITokenRepository.findByToken(jwt)
                     .map(t -> !t.isExpired() && !t.isRevoked())
                     .orElse(false);
             if (jwtService.isTokenValid(jwt, userDetails) && isTokenValid) {

@@ -1,5 +1,6 @@
 package com.boosting.code.auth_gateway_resolver.services;
 
+import com.boosting.code.auth_gateway_resolver.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -45,7 +47,10 @@ public class JwtService {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-
+    public String generateToken(
+            UserDetails userDetails){
+        return buildToken(new HashMap<>(),userDetails,jwtExpiration);
+    }
     public String generateToken(
             Map<String,Object> extraClaims,
             UserDetails userDetails){
@@ -75,5 +80,9 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public String generateRefreshToken(UserDetails userDetails) {
+        return buildToken(new HashMap<>(), userDetails, refreshExpiration);
     }
 }

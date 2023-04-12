@@ -1,6 +1,7 @@
 package com.boosting.code.auth_gateway_resolver.controllers;
 
 import com.boosting.code.auth_gateway_resolver.dtos.AuthResponseDto;
+import com.boosting.code.auth_gateway_resolver.dtos.AuthenticationDto;
 import com.boosting.code.auth_gateway_resolver.dtos.RegisterDto;
 import com.boosting.code.auth_gateway_resolver.services.AuthenticationService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,9 +28,9 @@ public class AuthenticationController {
     }
     @PostMapping("/authenticate")
     public ResponseEntity<AuthResponseDto> authenticate(
-            @RequestBody RegisterDto request
+            @RequestBody AuthenticationDto authenticationDto
     ) {
-        return ResponseEntity.ok(authenticationService.authenticate(request));
+        return ResponseEntity.ok(authenticationService.authenticate(authenticationDto));
     }
 
     @PostMapping("/refresh-token")
