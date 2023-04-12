@@ -24,29 +24,46 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    private final IUserRepository userRepository;
+    private final IUserRepository repository;
     private final ITokenRepository tokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-  public AuthResponseDto register(RegisterDto registerDto) {
-        var  user = User
-                .builder()
-                .firstname(registerDto.getFirstname())
-                .lastname(registerDto.getLastname())
-                .email(registerDto.getEmail())
-                .password(passwordEncoder.encode(registerDto.getPassword()))
+    public AuthResponseDto register(RegisterDto request) {
+        var user = User.builder()
+                .firstname(request.getFirstname())
+                .lastname(request.getLastname())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .role(Role.USER)
                 .build();
-
-        var savedUser=userRepository.save(user);
-        var jwtToken= jwtService.generateToken(user);
-        var refreshToken=jwtService.generateRefreshToken(user);
-        saveUserToken(savedUser,jwtToken);
+        var savedUser = repository.save(user);
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+        saveUserToken(savedUser, jwtToken);
         return AuthResponseDto.builder()
                 .accessToken(jwtToken)
-                    .refreshToken(refreshToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    public AuthResponseDto authenticate(AuthenticationDto request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+        var user = repository.findByEmail(request.getEmail())
+                .orElseThrow();
+        var jwtToken = jwtService.generateToken(user);
+        var refreshToken = jwtService.generateRefreshToken(user);
+        revokeAllUserTokens(user);
+        saveUserToken(user, jwtToken);
+        return AuthResponseDto.builder()
+                .accessToken(jwtToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -59,26 +76,6 @@ public class AuthenticationService {
                 .revoked(false)
                 .build();
         tokenRepository.save(token);
-    }
-
-    public AuthResponseDto authenticate(AuthenticationDto authenticationDto) {
-      authenticationManager.authenticate(
-              new UsernamePasswordAuthenticationToken(
-                      authenticationDto.getEmail(),
-                      authenticationDto.getPassword()
-              )
-      );
-      var user= userRepository.findByEmail(authenticationDto.getEmail())
-              .orElseThrow();
-
-      var jwtToken = jwtService.generateToken(user);
-      var refreshToken = jwtService.generateRefreshToken(user);
-      revokeAllUserTokens(user);
-      saveUserToken(user, jwtToken);
-      return AuthResponseDto.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
-                .build();
     }
 
     private void revokeAllUserTokens(User user) {
@@ -105,7 +102,7 @@ public class AuthenticationService {
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = this.userRepository.findByEmail(userEmail)
+            var user = this.repository.findByEmail(userEmail)
                     .orElseThrow();
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
