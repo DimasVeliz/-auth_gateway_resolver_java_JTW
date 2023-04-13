@@ -1,6 +1,5 @@
 package com.boosting.code.auth_gateway_resolver.services;
 
-import com.boosting.code.auth_gateway_resolver.entities.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
