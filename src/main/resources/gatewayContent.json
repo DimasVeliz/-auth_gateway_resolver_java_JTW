@@ -1,0 +1,7 @@
+{
+  "/api/v1/data/cloud": "http://localhost:8081",
+  "/api/v1/data/bash": "http://localhost:8082",
+  "/api/v1/data/cpp": "http://localhost:8083",
+  "/api/v1/data/dotnet": "http://localhost:8084",
+  "/api/v1/data/python": "http://localhost:8085"
+}

@@ -1,5 +1,7 @@
 package com.boosting.code.auth_gateway_resolver.config;
 
+import com.boosting.code.Config.WebConfig;
+import com.boosting.code.Services.Impl.ProxyServiceImpl;
 import com.boosting.code.auth_gateway_resolver.repositories.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -41,6 +43,15 @@ public class ApplicationConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public WebConfig webConfig() {
+        return new WebConfig();
+    }
+    @Bean
+    public ProxyServiceImpl proxyServiceImpl() {
+        return new ProxyServiceImpl(webConfig());
     }
 
 }
