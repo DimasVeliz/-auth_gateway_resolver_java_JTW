@@ -9,8 +9,13 @@ import org.springframework.stereotype.Service;
 public class HostResolverService {
 
     private final GatewayContent gatewayContent;
-
-    public String getHost4Resource(String resourceName){
-        return gatewayContent.getAppInfo().get(resourceName);
+private final String GATEWAY_PREFIX="/api/v1/data";
+    public String getHost4Resource(String resourcePath){
+    if(resourcePath.startsWith(GATEWAY_PREFIX)){
+        resourcePath = resourcePath.replace(GATEWAY_PREFIX,"");
+        String resource = resourcePath.split("/")[1];
+        return gatewayContent.getAppInfo().get(resource);
+    }
+    return null;
     }
 }
