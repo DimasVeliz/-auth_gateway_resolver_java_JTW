@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.boosting.code.auth_gateway_resolver.utilities.Utils.generateTrackingUUID;
+
 @RestController
 @RequestMapping("/api/v1/data")
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public class GatewayResolverController {
     public ResponseEntity<Object> getResource(HttpServletRequest request){
 
         String baseUrl= hostResolverService.getHost4Resource(request.getRequestURI());
-        ProxyResponseDto responseDto= proxyService.processGetRequest(request,"123",baseUrl);
+        ProxyResponseDto responseDto= proxyService.processGetRequest(request,generateTrackingUUID(),baseUrl);
         if(responseDto.isBinary()){
             return new ResponseEntity<>(responseDto.getFileInfo().getData(),HttpStatus.OK);
         }
