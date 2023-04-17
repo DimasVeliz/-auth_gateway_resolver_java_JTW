@@ -5,6 +5,7 @@ import com.boosting.code.Services.IProxyService;
 import com.boosting.code.auth_gateway_resolver.services.HostResolverService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,13 +21,14 @@ public class GatewayResolverController {
     private final IProxyService proxyService;
     private final HostResolverService hostResolverService;
     @GetMapping("/**")
-    public ResponseEntity<Object> getResource(HttpServletRequest request, @RequestHeader(defaultValue = "false") String needsBinary){
+    public ResponseEntity<Object> getResource(HttpServletRequest request, @RequestHeader(defaultValue = "false",name = "Needs-Binary") String needsBinary){
 
         boolean isBinary = needsBinary.equals("true");
         String baseUrl= hostResolverService.getHost4Resource(request.getRequestURI());
         ProxyResponseDto responseDto= proxyService.processGetRequest(request,generateTrackingUUID(),baseUrl, isBinary);
         if(responseDto.isBinary()){
-            return new ResponseEntity<>(responseDto.getFileInfo().getData(),HttpStatus.OK);
+            HttpHeaders headers = responseDto.getHeaders();
+            return new ResponseEntity<>(responseDto.getFileInfo().getData(),headers,HttpStatus.OK);
         }
         return new ResponseEntity<>(responseDto.getJsonData(),HttpStatus.OK);
     }
