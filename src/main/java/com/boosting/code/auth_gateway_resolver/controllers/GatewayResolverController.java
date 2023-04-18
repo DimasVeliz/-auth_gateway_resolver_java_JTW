@@ -27,7 +27,7 @@ public class GatewayResolverController {
 
     private final IProxyService proxyService;
     private final HostResolverService hostResolverService;
-    private IUserRepository userService;
+    private final IUserRepository userService;
 
     @GetMapping("/**")
     public ResponseEntity<Object> getResource(HttpServletRequest request, @RequestHeader(defaultValue = "false",name = "Needs-Binary") String needsBinary){
