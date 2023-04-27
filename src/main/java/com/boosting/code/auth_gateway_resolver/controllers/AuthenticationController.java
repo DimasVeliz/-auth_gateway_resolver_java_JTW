@@ -1,6 +1,6 @@
 package com.boosting.code.auth_gateway_resolver.controllers;
 
-import com.boosting.code.auth_gateway_resolver.dtos.AuthResponseDto;
+import com.boosting.code.auth_gateway_resolver.dtos.AuthServiceResponseDto;
 import com.boosting.code.auth_gateway_resolver.dtos.AuthenticationDto;
 import com.boosting.code.auth_gateway_resolver.dtos.RegisterDto;
 import com.boosting.code.auth_gateway_resolver.services.AuthenticationService;
@@ -21,14 +21,20 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterDto registerDto){
-        return ResponseEntity.ok(authenticationService.register(registerDto));
+    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
+        var serviceDtoResponse = authenticationService.register(registerDto);
+        return ResponseEntity.ok()
+                .headers(serviceDtoResponse.getHeaders())
+                .body(serviceDtoResponse.getUserEmail());
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponseDto> authenticate(
+    public ResponseEntity<String> authenticate(
             @RequestBody AuthenticationDto authenticationDto
     ) {
-        return ResponseEntity.ok(authenticationService.authenticate(authenticationDto));
+        var serviceDtoResponse = authenticationService.authenticate(authenticationDto);
+        return ResponseEntity.ok()
+                .headers(serviceDtoResponse.getHeaders())
+                .body(serviceDtoResponse.getUserEmail());
     }
 
     @PostMapping("/refresh-token")

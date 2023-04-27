@@ -1,6 +1,6 @@
 package com.boosting.code.auth_gateway_resolver.services;
 
-import com.boosting.code.auth_gateway_resolver.dtos.AuthResponseDto;
+import com.boosting.code.auth_gateway_resolver.dtos.AuthServiceResponseDto;
 import com.boosting.code.auth_gateway_resolver.dtos.AuthenticationDto;
 import com.boosting.code.auth_gateway_resolver.dtos.RegisterDto;
 import com.boosting.code.auth_gateway_resolver.entities.Role;
@@ -31,7 +31,10 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthResponseDto register(RegisterDto request) {
+    public AuthServiceResponseDto register(RegisterDto request) {
+        HttpHeaders headers= new HttpHeaders();
+        //TODO: add the refresh and access token to the headers object
+
         var user = User.builder()
                 .firstname(request.getFirstname())
                 .lastname(request.getLastname())
@@ -44,13 +47,16 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
-        return AuthResponseDto.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
+        return AuthServiceResponseDto.builder()
+                .userEmail(user.getEmail())
+                .headers(headers)
                 .build();
     }
 
-    public AuthResponseDto authenticate(AuthenticationDto request) {
+    public AuthServiceResponseDto authenticate(AuthenticationDto request) {
+        HttpHeaders headers= new HttpHeaders();
+        //TODO: add the refresh and access token to the headers object
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getEmail(),
@@ -63,9 +69,9 @@ public class AuthenticationService {
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
-        return AuthResponseDto.builder()
-                .accessToken(jwtToken)
-                .refreshToken(refreshToken)
+        return AuthServiceResponseDto.builder()
+                .userEmail(user.getEmail())
+                .headers(headers)
                 .build();
     }
 
@@ -95,6 +101,7 @@ public class AuthenticationService {
             HttpServletRequest request,
             HttpServletResponse response
     ) throws IOException {
+        HttpHeaders headers = new HttpHeaders();//TODO: possible bug, check
         final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         final String refreshToken;
         final String userEmail;
@@ -110,9 +117,9 @@ public class AuthenticationService {
                 var accessToken = jwtService.generateToken(user);
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
-                var authResponse = AuthResponseDto.builder()
-                        .accessToken(accessToken)
-                        .refreshToken(refreshToken)
+                var authResponse = AuthServiceResponseDto.builder()
+                        .userEmail(user.getEmail())
+                        .headers(headers)
                         .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
             }
