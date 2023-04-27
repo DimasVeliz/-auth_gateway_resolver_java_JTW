@@ -9,6 +9,7 @@ import com.boosting.code.auth_gateway_resolver.entities.TokenType;
 import com.boosting.code.auth_gateway_resolver.entities.User;
 import com.boosting.code.auth_gateway_resolver.repositories.ITokenRepository;
 import com.boosting.code.auth_gateway_resolver.repositories.IUserRepository;
+import com.boosting.code.auth_gateway_resolver.utilities.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final CookieUtils cookieUtils;
 
     public AuthServiceResponseDto register(RegisterDto request) {
         HttpHeaders headers= new HttpHeaders();
@@ -47,6 +49,11 @@ public class AuthenticationService {
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
         saveUserToken(savedUser, jwtToken);
+
+        Long duration = jwtService.extractExpiration(jwtToken).getTime();
+
+        addAccessTokenCookie(headers, jwtToken,duration);
+        addRefreshTokenCookie(headers, refreshToken,duration);
         return AuthServiceResponseDto.builder()
                 .userEmail(user.getEmail())
                 .headers(headers)
@@ -66,13 +73,29 @@ public class AuthenticationService {
         var user = repository.findByEmail(request.getEmail())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
+
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+
+        Long duration = jwtService.extractExpiration(jwtToken).getTime();
+
+        addAccessTokenCookie(headers, jwtToken,duration);
+        addRefreshTokenCookie(headers, refreshToken,duration);
         return AuthServiceResponseDto.builder()
                 .userEmail(user.getEmail())
                 .headers(headers)
                 .build();
+    }
+
+    private void addAccessTokenCookie(HttpHeaders headers, String jwtToken,Long duration) {
+        headers.add(HttpHeaders.SET_COOKIE, cookieUtils.createAccessTokenCookie(jwtToken, duration).toString());
+
+    }
+
+    private void addRefreshTokenCookie(HttpHeaders headers, String refreshToken,Long duration) {
+        headers.add(HttpHeaders.SET_COOKIE, cookieUtils.createRefreshTokenCookie(refreshToken, duration).toString());
+
     }
 
     private void saveUserToken(User user, String jwtToken) {
