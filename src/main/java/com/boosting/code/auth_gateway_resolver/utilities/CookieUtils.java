@@ -14,22 +14,26 @@ public class CookieUtils {
     private String refreshTokenCookieName;
 
     public HttpCookie createAccessTokenCookie(String token, Long duration) {
-        //TODO: Read about whether encrypting the token is an overkill
+        //TODO: Read about whether encrypting the token is an overkill, secure:FALSE over HTTP
         //String encryptedToken = SecurityCipher.encrypt(token);
         return ResponseCookie.from(accessTokenCookieName, token)
                 .maxAge(duration)
                 .httpOnly(true)
                 .path("/")
+                .secure(false)
+                .sameSite("None")
                 .build();
     }
 
     public HttpCookie createRefreshTokenCookie(String token, Long duration) {
-        //TODO: Read about whether encrypting the token is an overkill
+        //TODO: Read about whether encrypting the token is an overkill, secure:FALSE over HTTP
         //String encryptedToken = SecurityCipher.encrypt(token);
         return ResponseCookie.from(refreshTokenCookieName, token)
                 .maxAge(duration)
                 .httpOnly(true)
                 .path("/")
+                .secure(false)
+                .sameSite("None")
                 .build();
     }
 
