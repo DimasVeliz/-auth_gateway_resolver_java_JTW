@@ -4,14 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpHeaders;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthServiceResponseDto {
+public class AuthResponseDto {
     String token;
     String refreshToken;
-    HttpHeaders headers;
 }

@@ -55,7 +55,8 @@ public class AuthenticationService {
         addAccessTokenCookie(headers, jwtToken,duration);
         addRefreshTokenCookie(headers, refreshToken,duration);
         return AuthServiceResponseDto.builder()
-                .userEmail(user.getEmail())
+                .token(jwtToken)
+                .refreshToken(refreshToken)
                 .headers(headers)
                 .build();
     }
@@ -83,7 +84,8 @@ public class AuthenticationService {
         addAccessTokenCookie(headers, jwtToken,duration);
         addRefreshTokenCookie(headers, refreshToken,duration);
         return AuthServiceResponseDto.builder()
-                .userEmail(user.getEmail())
+                .token(jwtToken)
+                .refreshToken(refreshToken)
                 .headers(headers)
                 .build();
     }
@@ -141,7 +143,7 @@ public class AuthenticationService {
                 revokeAllUserTokens(user);
                 saveUserToken(user, accessToken);
                 var authResponse = AuthServiceResponseDto.builder()
-                        .userEmail(user.getEmail())
+                        .token(user.getEmail())
                         .headers(headers)
                         .build();
                 new ObjectMapper().writeValue(response.getOutputStream(), authResponse);

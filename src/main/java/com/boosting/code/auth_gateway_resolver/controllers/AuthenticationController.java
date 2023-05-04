@@ -1,6 +1,6 @@
 package com.boosting.code.auth_gateway_resolver.controllers;
 
-import com.boosting.code.auth_gateway_resolver.dtos.AuthServiceResponseDto;
+import com.boosting.code.auth_gateway_resolver.dtos.AuthResponseDto;
 import com.boosting.code.auth_gateway_resolver.dtos.AuthenticationDto;
 import com.boosting.code.auth_gateway_resolver.dtos.RegisterDto;
 import com.boosting.code.auth_gateway_resolver.services.AuthenticationService;
@@ -21,20 +21,32 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterDto registerDto){
+    public ResponseEntity<AuthResponseDto> register(@RequestBody RegisterDto registerDto){
         var serviceDtoResponse = authenticationService.register(registerDto);
+        var authBody=AuthResponseDto
+                                    .builder()
+                                    .token(serviceDtoResponse.getToken())
+                                    .refreshToken(serviceDtoResponse.getRefreshToken())
+                                    .build();
+
         return ResponseEntity.ok()
                 .headers(serviceDtoResponse.getHeaders())
-                .body(serviceDtoResponse.getUserEmail());
+                .body(authBody);
     }
     @PostMapping("/authenticate")
-    public ResponseEntity<String> authenticate(
+    public ResponseEntity<AuthResponseDto> authenticate(
             @RequestBody AuthenticationDto authenticationDto
     ) {
         var serviceDtoResponse = authenticationService.authenticate(authenticationDto);
+        var authBody=AuthResponseDto
+                .builder()
+                .token(serviceDtoResponse.getToken())
+                .refreshToken(serviceDtoResponse.getRefreshToken())
+                .build();
+
         return ResponseEntity.ok()
                 .headers(serviceDtoResponse.getHeaders())
-                .body(serviceDtoResponse.getUserEmail());
+                .body(authBody);
     }
 
     @PostMapping("/refresh-token")
