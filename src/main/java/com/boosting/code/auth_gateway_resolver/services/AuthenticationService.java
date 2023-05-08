@@ -3,6 +3,7 @@ package com.boosting.code.auth_gateway_resolver.services;
 import com.boosting.code.auth_gateway_resolver.dtos.AuthServiceResponseDto;
 import com.boosting.code.auth_gateway_resolver.dtos.AuthenticationDto;
 import com.boosting.code.auth_gateway_resolver.dtos.RegisterDto;
+import com.boosting.code.auth_gateway_resolver.dtos.UserDto;
 import com.boosting.code.auth_gateway_resolver.entities.Role;
 import com.boosting.code.auth_gateway_resolver.entities.Token;
 import com.boosting.code.auth_gateway_resolver.entities.TokenType;
@@ -54,10 +55,17 @@ public class AuthenticationService {
 
         addAccessTokenCookie(headers, jwtToken,duration);
         addRefreshTokenCookie(headers, refreshToken,duration);
+        var userDto = UserDto.builder()
+                .firstName(savedUser.getFirstname())
+                .lastName(savedUser.getLastname())
+                .email(savedUser.getEmail())
+                .build();
+
         return AuthServiceResponseDto.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
                 .headers(headers)
+                .userDto(userDto)
                 .build();
     }
 
@@ -83,10 +91,17 @@ public class AuthenticationService {
 
         addAccessTokenCookie(headers, jwtToken,duration);
         addRefreshTokenCookie(headers, refreshToken,duration);
+        var userDto = UserDto.builder()
+                .firstName(user.getFirstname())
+                .lastName(user.getLastname())
+                .email(user.getEmail())
+                .build();
+
         return AuthServiceResponseDto.builder()
                 .token(jwtToken)
                 .refreshToken(refreshToken)
                 .headers(headers)
+                .userDto(userDto)
                 .build();
     }
 

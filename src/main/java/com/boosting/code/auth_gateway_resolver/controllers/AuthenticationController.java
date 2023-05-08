@@ -27,6 +27,7 @@ public class AuthenticationController {
                                     .builder()
                                     .token(serviceDtoResponse.getToken())
                                     .refreshToken(serviceDtoResponse.getRefreshToken())
+                                    .userDto(serviceDtoResponse.getUserDto())
                                     .build();
 
         return ResponseEntity.ok()
@@ -42,6 +43,7 @@ public class AuthenticationController {
                 .builder()
                 .token(serviceDtoResponse.getToken())
                 .refreshToken(serviceDtoResponse.getRefreshToken())
+                .userDto(serviceDtoResponse.getUserDto())
                 .build();
 
         return ResponseEntity.ok()

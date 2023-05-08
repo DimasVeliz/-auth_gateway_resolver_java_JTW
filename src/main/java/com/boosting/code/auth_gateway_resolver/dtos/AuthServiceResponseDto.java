@@ -13,5 +13,6 @@ import org.springframework.http.HttpHeaders;
 public class AuthServiceResponseDto {
     String token;
     String refreshToken;
+    UserDto userDto;
     HttpHeaders headers;
 }
