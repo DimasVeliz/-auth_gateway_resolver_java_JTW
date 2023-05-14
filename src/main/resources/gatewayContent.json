@@ -1,7 +1,4 @@
 {
   "cloud": "http://localhost:8081",
-  "bash": "http://localhost:8082",
-  "cpp": "http://localhost:8083",
-  "dotnet": "http://localhost:8084",
-  "python": "http://localhost:8085"
+  "blog": "http://localhost:8083"
 }
